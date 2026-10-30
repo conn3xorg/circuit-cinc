@@ -75,7 +75,7 @@ jobs:
       # more shows Cinc put it back, then found nothing to do.
       - name: Check the cookbook converged, and a second run changes nothing
         run: |
-          sudo podman exec -i circuit-chef bash -eu <<'EOF'
+          sudo podman exec -i circuit-cinc bash -eu <<'EOF'
           /opt/cinc/bin/cinc-client --version
           grep -q 'Converged by Cinc' /etc/hello-from-cinc
           [ "$(systemctl is-enabled cinc-client.timer)" = enabled ]

@@ -1,6 +1,6 @@
 # Local example
 
-Applies circuit-chef to a throwaway Rocky Linux 10 container with systemd. You need Conn3x and Podman.
+Applies circuit-cinc to a throwaway Rocky Linux 10 container with systemd. You need Conn3x and Podman.
 
 It writes a small cookbook, `hello`, to `/var/lib/cinc/repo`, installs Cinc Client, converges it once, and sets an hourly timer:
 
