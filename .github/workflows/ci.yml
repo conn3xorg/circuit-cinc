@@ -74,7 +74,7 @@ jobs:
       # The apply converged once. Tampering with the file and converging twice
       # more shows Cinc put it back, then found nothing to do.
       - name: Check the cookbook converged, and a second run changes nothing
-        run: |
+        run: &check |
           sudo podman exec -i circuit-cinc bash -eu <<'EOF'
           /opt/cinc/bin/cinc-client --version
           grep -q 'Converged by Cinc' /etc/hello-from-cinc
@@ -90,6 +90,42 @@ jobs:
           systemctl start cinc-client.service
           journalctl -u cinc-client.service --since "$since" --no-pager | grep -q ' 0/1 resources updated'
           EOF
+      # Restarting the container boots systemd again, so the timer only comes
+      # back if it's enabled. The plan has nothing to do, and Cinc converges
+      # as before.
+      - name: Restart the host, then plan again with no changes
+        working-directory: examples/local
+        run: |
+          sudo podman restart circuit-cinc
+          for _ in $(seq 60); do
+            case $(sudo podman exec circuit-cinc systemctl is-system-running 2>/dev/null) in running|degraded) break ;; esac
+            sleep 1
+          done
+          conn3x plan -detailed-exitcode
+      - name: Check the cookbook converges after the restart
+        run: *check
+      # A fresh host and fresh state get the previous release, then the
+      # circuit's own pin is applied over it, the way someone raises
+      # cinc_version. CI runs on amd64, so only those checksums are given.
+      - name: Upgrade from Cinc 19.3.14 on a fresh host, then plan again with no changes
+        working-directory: examples/local
+        env:
+          CONTAINERFILE: ${{ github.workspace }}/conn3x/test/images/${{ matrix.distro }}/Containerfile
+          PODMAN: sudo podman
+        run: |
+          ./down.sh
+          ./up.sh
+          rm -f terraform.tfstate terraform.tfstate.backup
+          version() { sudo podman exec circuit-cinc /opt/cinc/bin/cinc-client --version; }
+          conn3x apply -auto-approve -var cinc_version=19.3.14 \
+            -var 'checksums={"ubuntu/24.04/x86_64"="c710cc8bf953fa56b7a4b0b726d9fcb9cb5bad2dc8caec4eaa439c4626f9aebf","debian/13/x86_64"="a6094f97527371b113acfda7bcceecc4d7113a00f71031d709bbe8367aeefebd","el/10/x86_64"="5c8e07ca685fbb43a89eb425fc7884709e9a0cd796d1bde919b842fe21a3ab09"}'
+          version | grep -q ' 19\.3\.14$'
+          conn3x apply -auto-approve
+          conn3x plan -detailed-exitcode
+          pin=$(sed -n '/variable "cinc_version"/,/^}/s/.*default *= *"\(.*\)"/\1/p' ../../variables.tf)
+          version | grep -qF " $pin"
+      - name: Check the upgraded Cinc converges
+        run: *check
       - name: Clean up
         if: always()
         working-directory: examples/local

@@ -113,7 +113,7 @@ Requires Conn3x v0.6.9 or later and systemd on each host, on x86_64 or aarch64. 
 
 ## Tested on
 
-Ubuntu 24.04, Debian 13 and Rocky Linux 10. CI applies [examples/local](examples/local) to each on amd64 and checks the second plan has no changes. Then it checks the small cookbook wrote its file and the timer is on, overwrites the file, and converges twice: the first run reports `1/1 resources updated` and puts the file back, and the second reports `0/1`.
+Ubuntu 24.04, Debian 13 and Rocky Linux 10. CI applies [examples/local](examples/local) to each on amd64 and checks the second plan has no changes. Then it checks the small cookbook wrote its file and the timer is on, overwrites the file, and converges twice: the first run reports `1/1 resources updated` and puts the file back, and the second reports `0/1`. It restarts the host and runs the same checks, then upgrades: on a fresh host it installs 19.3.14, applies again with the default `cinc_version`, and expects a clean plan, the new version and the same checks passing.
 
 The same checks passed by hand in arm64 containers of all three. On a Fedora 45 container, the plan stopped with the unsupported-platform message.
 
