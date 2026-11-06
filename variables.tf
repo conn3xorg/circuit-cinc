@@ -35,6 +35,7 @@ variable "ssh_become" {
 
 variable "cinc_version" {
   type        = string
+  nullable    = false
   default     = "19.4.46"
   description = "Cinc Client release to install, from https://omnitruck.cinc.sh/stable/cinc/versions/all."
 
@@ -46,6 +47,7 @@ variable "cinc_version" {
 
 variable "checksums" {
   type        = map(string)
+  nullable    = false
   description = "SHA-256 of the package for each platform, by \"PLATFORM/VERSION/ARCH\". Change these with cinc_version."
   default = {
     "ubuntu/24.04/x86_64"  = "71dd1056fc86b29b94d95798d087df8ad081670d070f01dbc38a87e9f8e02a22"
