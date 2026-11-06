@@ -20,7 +20,7 @@ Cinc is not Chef, and neither Cinc nor this circuit is affiliated with Progress.
 
 ```hcl
 module "cinc" {
-  source = "github.com/conn3xorg/circuit-cinc?ref=v0.1.1"
+  source = "github.com/conn3xorg/circuit-cinc?ref=v0.1.2"
 
   hosts                = { web1 = "203.0.113.10", web2 = "203.0.113.11" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
