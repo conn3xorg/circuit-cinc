@@ -152,8 +152,8 @@ circuit "cinc" {
   }
 
   step "reload" {
-    command {
-      command = "systemctl daemon-reload"
+    service_action {
+      action = "daemon-reload"
       triggers = {
         service = length(var.run_list) > 0 ? sha256(local.service_content) : ""
         timer   = var.schedule != null ? sha256(local.timer_content) : ""
