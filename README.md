@@ -20,7 +20,7 @@ Cinc is not Chef, and neither Cinc nor this circuit is affiliated with Progress.
 
 ```hcl
 module "cinc" {
-  source = "github.com/conn3xorg/circuit-cinc?ref=v0.3.0"
+  source = "github.com/conn3xorg/circuit-cinc?ref=v0.4.0"
 
   hosts                = { web1 = "203.0.113.10", web2 = "203.0.113.11" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
@@ -109,7 +109,7 @@ Those platforms haven't been tested with this circuit.
 
 ## Requirements
 
-Requires Conn3x v0.36.0 or later and systemd on each host, on x86_64 or aarch64. Each host needs to reach `packages.cinc.sh` and its package mirror. Converging needs no inbound port.
+Requires Conn3x v0.37.0 or later and systemd on each host, on x86_64 or aarch64. Each host needs to reach `packages.cinc.sh` and its package mirror. Converging needs no inbound port.
 
 Coming from v0.2.0 or earlier, the first plan swaps the old `command` step for a `package` step: 1 to add, 1 to destroy. With the client already at `cinc_version`, the apply installs nothing and runs nothing on the host. Every plan after that is clean.
 
