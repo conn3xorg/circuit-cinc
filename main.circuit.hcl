@@ -171,12 +171,14 @@ circuit "cinc" {
     }
   }
 
-  # systemctl waits for a oneshot unit to finish and fails if it fails, so a
-  # failed converge fails the apply, with the detail in the journal.
+  # A start of the oneshot unit waits for the converge to finish and fails
+  # if it fails, so a failed converge fails the apply, with the detail in
+  # the journal. service_action tries again if systemd re-executes mid-apply.
   step "converge" {
     for_each = length(var.run_list) > 0 ? toset(["converge"]) : toset([])
-    command {
-      command = "systemctl start cinc-client.service"
+    service_action {
+      name   = "cinc-client.service"
+      action = "start"
       triggers = {
         version = var.cinc_version
         config  = sha256(local.config_content[each.key])
