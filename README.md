@@ -52,7 +52,7 @@ Everything in `repo_path` runs as root. Keep it writable by root alone, and only
 On each host, in order:
 
 1. Installs `curl`, then downloads the Cinc package for the host's distribution and architecture from `packages.cinc.sh` into `/var/cache/conn3x-cinc`, and checks its SHA-256 before using it.
-2. Installs it with `dpkg` or `rpm`, unless that version is already there. Changing `cinc_version` moves the client up or down.
+2. Installs it with `apt-get` or `dnf`, unless that version is already there, and only if the file still has the SHA-256 the download checked. The package carries its own Ruby and needs nothing from the host's repositories. Changing `cinc_version` moves the client up or down.
 3. Writes `/etc/cinc/client.rb`, which sets local mode, `repo_path`, the node's name from its key in `hosts`, and `/var/lib/cinc/nodes` for the node's record, which keeps `repo_path` clean if it's a Git checkout.
 4. With a `run_list`, writes `/etc/systemd/system/cinc-client.service`, a oneshot unit that runs `cinc-client --local-mode` with your run list.
 5. With a `schedule`, writes and starts `cinc-client.timer`. A run missed while the host was off happens when it comes back.
@@ -109,7 +109,9 @@ Those platforms haven't been tested with this circuit.
 
 ## Requirements
 
-Requires Conn3x v0.29.0 or later and systemd on each host, on x86_64 or aarch64. Each host needs to reach `packages.cinc.sh` and its package mirror. Converging needs no inbound port.
+Requires Conn3x v0.36.0 or later and systemd on each host, on x86_64 or aarch64. Each host needs to reach `packages.cinc.sh` and its package mirror. Converging needs no inbound port.
+
+Coming from v0.2.0 or earlier, the first plan swaps the old `command` step for a `package` step: 1 to add, 1 to destroy. With the client already at `cinc_version`, the apply installs nothing and runs nothing on the host. Every plan after that is clean.
 
 ## Tested on
 
