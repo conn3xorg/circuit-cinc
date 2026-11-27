@@ -110,13 +110,13 @@ circuit "cinc" {
     }
   }
 
-  # Goes straight to dpkg and rpm: the package has its own Ruby and no
-  # dependencies to fetch, and --oldpackage lets cinc_version go down as well
-  # as up.
+  # Installs from the checked file with apt-get or dnf. The package has its
+  # own Ruby and nothing to fetch, and an older file downgrades it.
   step "install" {
-    command {
-      command = data.conn3x_host.facts[each.key].os_family == "debian" ? "dpkg -i ${local.cache_dir}/${local.package[each.key]}" : "rpm -U --oldpackage ${local.cache_dir}/${local.package[each.key]}"
-      unless  = data.conn3x_host.facts[each.key].os_family == "debian" ? "[ \"$(dpkg-query -W -f '$${Version}' cinc 2>/dev/null)\" = ${var.cinc_version}-1 ]" : "[ \"$(rpm -q --qf '%%{VERSION}' cinc 2>/dev/null)\" = ${var.cinc_version} ]"
+    package {
+      name          = "cinc"
+      source        = conn3x_download.cinc__download[each.key].dest
+      source_sha256 = conn3x_download.cinc__download[each.key].sha256
     }
   }
 
